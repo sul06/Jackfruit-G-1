@@ -1,6 +1,5 @@
 
 
-FILE_PATH = r"C:\Users\2025\Desktop\jackfruit\medicine_database(4).xlsx"
 
 import time, re, math, os
 from pathlib import Path
@@ -8,6 +7,29 @@ import numpy as np
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
+class SimpleScrollFrame(ttk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        self.canvas = tk.Canvas(self, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.scroll_frame = ttk.Frame(self.canvas)
+ 
+        self.canvas_window = self.canvas.create_window((0,0), window=self.scroll_frame, anchor="nw")
+       
+        self.canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+
+        self.scroll_frame.bind("<Configure>", lambda e: self.canvas.configure(
+            scrollregion=self.canvas.bbox("all")
+        ))
+
+        self.canvas.bind("<Configure>", lambda e: self.canvas.itemconfig(
+            self.canvas_window, width=e.width
+        ))
+
 
 
 def timing(fn):
@@ -231,24 +253,24 @@ def create_and_open_notepad(text, suggested_filename=None):
 class PrescriptionGUI:
     def __init__(self, root):
         self.root = root
+        scroll_container = SimpleScrollFrame(root)
+        self.main = scroll_container.scroll_frame
+        scroll_container.pack(fill="both", expand=True)
         root.title("Prescription Helper — assigned dose (250/500/650)")
         root.geometry("1200x820")
 
        
-        try:
-            self.df = load_dataset(FILE_PATH)
-            ds_text = f"Loaded: {FILE_PATH} ({len(self.df)} rows)"
-        except Exception as e:
-            self.df = pd.DataFrame(columns=["Medicine", "Symptoms", "_tokens"])
-            ds_text = f"Default not loaded: {e}"
+        self.df = pd.DataFrame(columns=["Medicine", "Symptoms", "_tokens"])
+        ds_text = "No database loaded. Please click 'Browse Excel' to select a file."
 
         
-        top = ttk.Frame(root); top.pack(fill="x", padx=10, pady=8)
-        ttk.Label(top, text=ds_text, font=("Segoe UI", 10)).pack(side="left", anchor="w")
+        top = ttk.Frame(self.main); top.pack(fill="x", padx=10, pady=8)
+        self.ds_label = ttk.Label(top, text=ds_text, font=("Segoe UI", 10))
+        self.ds_label.pack(side="left", anchor="w")
         ttk.Button(top, text="Browse Excel", command=self.browse).pack(side="right")
 
         
-        input_frame = ttk.LabelFrame(root, text="Enter disease / symptoms and patient info", padding=12)
+        input_frame = ttk.LabelFrame(self.main, text="Enter disease / symptoms and patient info", padding=12)
         input_frame.pack(fill="x", padx=10, pady=(8,12))
 
         ttk.Label(input_frame, text="Disease / Symptoms:", font=("Segoe UI", 10)).grid(row=0, column=0, sticky="w", padx=6, pady=6)
@@ -280,7 +302,7 @@ class PrescriptionGUI:
         ttk.Button(btns, text="Save Prescription", command=self.on_save_prescription).pack(side="left")
 
       
-        out_frame = ttk.Frame(root); out_frame.pack(fill="both", expand=True, padx=10, pady=6)
+        out_frame = ttk.Frame(self.main); out_frame.pack(fill="both", expand=True, padx=10, pady=6)
 
         left = ttk.LabelFrame(out_frame, text="Primary Prescription", padding=10)
         left.pack(side="left", fill="both", expand=True, padx=(0,8))
@@ -292,18 +314,18 @@ class PrescriptionGUI:
         self.supp_text = tk.Text(right, width=60, height=30, wrap="word", font=("Segoe UI", 11))
         self.supp_text.pack(fill="both", expand=True, padx=6, pady=6)
 
-        bottom = ttk.LabelFrame(root, text="Patient metrics & Dosing suggestion (illustrative)", padding=10)
+        bottom = ttk.LabelFrame(self.main, text="Patient metrics & Dosing suggestion (illustrative)", padding=10)
         bottom.pack(fill="x", padx=10, pady=(6,12))
         self.metrics_text = tk.Text(bottom, height=8, wrap="word", font=("Segoe UI", 11))
         self.metrics_text.pack(fill="x", padx=6, pady=6)
         ttk.Button(bottom, text="Get Diet Plan", command=self.open_diet_window).pack(pady=5)
-        self.diet_text = tk.Text(root, height=12, wrap="word")
+        self.diet_text = tk.Text(self.main, height=12, wrap="word")
         self.diet_text.pack(fill="x", padx=10, pady=10)
 
         disclaimer = ("Disclaimer: This tool provides illustrative suggestions only. "
                       "It is NOT medical advice. Consult a qualified healthcare professional.")
-        ttk.Label(root, text=disclaimer, foreground="red", wraplength=1160, justify="left", font=("Segoe UI", 9)).pack(padx=10, pady=(0,6))
-        self.status = ttk.Label(root, text="Ready", font=("Segoe UI", 10))
+        ttk.Label(self.main, text=disclaimer, foreground="red", wraplength=1160, justify="left", font=("Segoe UI", 9)).pack(padx=10, pady=(0,6))
+        self.status = ttk.Label(self.main, text="Ready", font=("Segoe UI", 10))
         self.status.pack(fill="x", padx=10, pady=(0,8))
 
         self.last_prescription = None
@@ -314,10 +336,11 @@ class PrescriptionGUI:
             return
         try:
             self.df = load_dataset(p)
-            self.status.config(text=f"Loaded {p} ({len(self.df)} rows)")
+            self.ds_label.config(text=f"Loaded: {p} ({len(self.df)} rows)") 
+            self.status.config(text="Database loaded successfully!")
         except Exception as e:
-            messagebox.showerror("Load error", str(e))
-            self.status.config(text=f"Load failed: {e}")
+            self.ds_label.config(text=f"Failed to load file: {e}")
+            self.status.config(text="Load failed")
 
     def clear_output(self):
         self.primary_text.delete("1.0", "end")
@@ -562,5 +585,7 @@ class PrescriptionGUI:
 
 if __name__ == "__main__":
     root = tk.Tk()
+    root.update_idletasks()
+    root.minsize(root.winfo_width(), root.winfo_height() + 200)
     app = PrescriptionGUI(root)
     root.mainloop()
