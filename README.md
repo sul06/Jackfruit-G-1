@@ -8,7 +8,7 @@ To use the assistant an excel database with medicines and symptoms must exist, s
 
 Done By <br/>
 Mohammad Hasan  <br/>
-Maynank Singhania <br/>
+Mayank Singhania <br/>
 Mohamed Sulaiman Rahman <br/>
 Harshwardhan  <br/>
 
