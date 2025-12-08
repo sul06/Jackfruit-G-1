@@ -6,4 +6,9 @@ This project is a Python-based clinical support tool that helps users identify s
 -----IMPORTANT-----
 To use the assistant an excel database with medicines and symptoms must exist, standard database is provided, simply run the program and click on "Browse Excel" and select the database file 
 
+Done By
+Mohammad Hasan
+Maynank Singhania
+Mohamed Sulaiman Rahman
+Harshwardhan
 
