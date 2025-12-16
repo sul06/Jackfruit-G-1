@@ -12,3 +12,15 @@ Mayank Singhania <br/>
 Mohamed Sulaiman Rahman <br/>
 Harshwardhan  <br/>
 
+<img width="825" height="571" alt="image" src="https://github.com/user-attachments/assets/45d940a0-ba44-4cc6-ac6d-fb3cf774349b" />
+<img width="947" height="1120" alt="image" src="https://github.com/user-attachments/assets/415eb5ae-d216-4258-ba41-622f4b4bef52" />
+<img width="948" height="591" alt="image" src="https://github.com/user-attachments/assets/87806c6b-0813-4f04-a93d-617fe51af16e" />
+<img width="1053" height="1100" alt="image" src="https://github.com/user-attachments/assets/032848da-1ecf-4c57-b6d8-bbfe8a568ee4" />
+<img width="1030" height="598" alt="image" src="https://github.com/user-attachments/assets/5124315f-492d-4593-b9eb-16676653379e" />
+<img width="883" height="1082" alt="image" src="https://github.com/user-attachments/assets/52d88ce9-b214-446f-bd57-b5154661e25c" />
+
+
+
+
+
+
